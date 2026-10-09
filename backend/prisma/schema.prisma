@@ -1,0 +1,252 @@
+// =============================================================================
+// VitalNode — Prisma Schema v2.0
+// Provider: SQLite (dev). Swap to postgresql by changing provider + DATABASE_URL.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── HOSPITALS ────────────────────────────────────────────────────────────────
+model Hospital {
+  id          String   @id @default(uuid())
+  name        String
+  city        String
+  latitude    Float
+  longitude   Float
+  contactInfo String   @map("contact_info")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  donors     Donor[]
+  recipients Recipient[]
+
+  @@map("hospitals")
+}
+
+// ─── DONORS ───────────────────────────────────────────────────────────────────
+// WHY causeOfDeath: required for Donor Risk Index (DRI) computation.
+// WHY donorDeceasedAt: enables Cold Ischemic Time (CIT) calculation.
+// WHY donorRiskIndex: pre-computed composite risk score stored for fast reads.
+model Donor {
+  id              String    @id @default(uuid())
+  name            String
+  age             Int
+  bloodGroup      String    @map("blood_group")
+  organType       String    @map("organ_type")
+  hlaType         String    @map("hla_type")       // kept as JSON for backward compat; HlaAntigen is authoritative
+  hospitalId      String    @map("hospital_id")
+  consentStatus   String    @default("Pending")    @map("consent_status")
+  isAvailable     Boolean   @default(true)         @map("is_available")
+  registeredAt    DateTime  @default(now())        @map("registered_at")
+
+  // NEW v2 fields
+  causeOfDeath    String?   @map("cause_of_death") // Trauma | Stroke | CardiacArrest | Other
+  donorDeceasedAt DateTime? @map("donor_deceased_at")
+  donorRiskIndex  Float?    @map("donor_risk_index") // computed on registration
+
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+
+  compatibilityMatches CompatibilityMatch[]
+  transplants          Transplant[]
+  hlaAntigens          HlaAntigen[]
+  alerts               Alert[]
+  exchangeLegs         ExchangeLeg[]
+
+  @@index([bloodGroup],           name: "idx_donor_blood_group")
+  @@index([organType],            name: "idx_donor_organ_type")
+  @@index([hospitalId],           name: "idx_donor_hospital")
+  @@index([organType, bloodGroup],name: "idx_donor_organ_blood")
+  @@index([isAvailable],          name: "idx_donor_available")
+  @@map("donors")
+}
+
+// ─── RECIPIENTS ───────────────────────────────────────────────────────────────
+model Recipient {
+  id                 String   @id @default(uuid())
+  name               String
+  age                Int
+  bloodGroup         String   @map("blood_group")
+  organTypeNeeded    String   @map("organ_type_needed")
+  hlaType            String   @map("hla_type")
+  hospitalId         String   @map("hospital_id")
+  severityScore      Int      @map("severity_score")
+  waitTimeDays       Int      @default(0) @map("wait_time_days")
+  priorFailedMatches Int      @default(0) @map("prior_failed_matches")
+  status             String   @default("Waiting") @map("status")
+  registeredAt       DateTime @default(now()) @map("registered_at")
+
+  hospital Hospital @relation(fields: [hospitalId], references: [id])
+
+  compatibilityMatches CompatibilityMatch[]
+  transplants          Transplant[]
+  hlaAntigens          HlaAntigen[]
+  alerts               Alert[]
+  exchangeLegs         ExchangeLeg[]
+
+  @@index([bloodGroup],                  name: "idx_recipient_blood_group")
+  @@index([organTypeNeeded],             name: "idx_recipient_organ_type")
+  @@index([hospitalId],                  name: "idx_recipient_hospital")
+  @@index([status],                      name: "idx_recipient_status")
+  @@index([organTypeNeeded, bloodGroup], name: "idx_recipient_organ_blood")
+  @@map("recipients")
+}
+
+// ─── HLA ANTIGENS (3NF/BCNF normalized from JSON string) ─────────────────────
+// WHY: Moving HLA data out of a JSON string into a proper join table makes
+// antigens indexable, searchable, and correctly modeled in 3NF.
+// entityType discriminates between Donor and Recipient rows.
+model HlaAntigen {
+  id          String    @id @default(uuid())
+  entityType  String    @map("entity_type")   // "Donor" | "Recipient"
+  antigenCode String    @map("antigen_code")  // e.g. "A1", "B8", "DR3"
+
+  donorId     String?   @map("donor_id")
+  recipientId String?   @map("recipient_id")
+
+  donor     Donor?     @relation(fields: [donorId],     references: [id])
+  recipient Recipient? @relation(fields: [recipientId], references: [id])
+
+  @@index([donorId],                    name: "idx_hla_donor")
+  @@index([recipientId],                name: "idx_hla_recipient")
+  @@index([entityType, antigenCode],    name: "idx_hla_entity_antigen")
+  @@map("hla_antigens")
+}
+
+// ─── COMPATIBILITY MATCHES (Graph Edge Table) ─────────────────────────────────
+// WHY coldIschemicTimeHours: viability constraint — if CIT > organ limit → Rejected
+// WHY predictedGraftSurvival5yr: deterministic model replaces subjective assessment
+model CompatibilityMatch {
+  id                       String   @id @default(uuid())
+  donorId                  String   @map("donor_id")
+  recipientId              String   @map("recipient_id")
+  bloodCompatible          Boolean  @map("blood_compatible")
+  hlaMatchScore            Float    @map("hla_match_score")
+  organTypeMatch           Boolean  @map("organ_type_match")
+  distanceKm               Float    @map("distance_km")
+  urgencyScore             Float    @map("urgency_score")
+  overallCompatibilityScore Float   @map("overall_compatibility_score")
+  matchStatus              String   @default("Candidate") @map("match_status")
+  createdAt                DateTime @default(now())       @map("created_at")
+
+  // NEW v2 fields
+  coldIschemicTimeHours       Float?  @map("cold_ischemic_time_hours")
+  predictedGraftSurvival5yr   Float?  @map("predicted_graft_survival_5yr")
+  citExceeded                 Boolean @default(false) @map("cit_exceeded")
+
+  donor      Donor     @relation(fields: [donorId],     references: [id])
+  recipient  Recipient @relation(fields: [recipientId], references: [id])
+  transplant Transplant?
+
+  @@unique([donorId, recipientId], name: "unique_donor_recipient")
+  @@index([donorId],     name: "idx_match_donor")
+  @@index([recipientId], name: "idx_match_recipient")
+  @@index([matchStatus], name: "idx_match_status")
+  @@map("compatibility_matches")
+}
+
+// ─── AUDIT LOG (Append-Only) ──────────────────────────────────────────────────
+model AuditLog {
+  id         String   @id @default(uuid())
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  action     String
+  actor      String
+  details    String
+  timestamp  DateTime @default(now())
+
+  @@index([entityType], name: "idx_audit_entity_type")
+  @@index([entityId],   name: "idx_audit_entity_id")
+  @@index([timestamp],  name: "idx_audit_timestamp")
+  @@map("audit_logs")
+}
+
+// ─── TRANSPLANTS ──────────────────────────────────────────────────────────────
+model Transplant {
+  id             String   @id @default(uuid())
+  matchId        String   @unique @map("match_id")
+  donorId        String   @map("donor_id")
+  recipientId    String   @map("recipient_id")
+  outcome        String   @default("Pending")
+  transplantDate DateTime @default(now()) @map("transplant_date")
+  notes          String?
+
+  match     CompatibilityMatch @relation(fields: [matchId],     references: [id])
+  donor     Donor              @relation(fields: [donorId],     references: [id])
+  recipient Recipient          @relation(fields: [recipientId], references: [id])
+
+  @@index([donorId],    name: "idx_transplant_donor")
+  @@index([recipientId],name: "idx_transplant_recipient")
+  @@index([outcome],    name: "idx_transplant_outcome")
+  @@map("transplants")
+}
+
+// ─── ALERTS ───────────────────────────────────────────────────────────────────
+// WHY: Proactive notification layer for CIT warnings, urgency escalations,
+// and new match discoveries. Drives the NotificationCenter UI.
+model Alert {
+  id          String   @id @default(uuid())
+  type        String   // NewMatch | CITWarning | StatusChange | UrgencyEscalation
+  message     String
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  recipientId String?  @map("recipient_id")
+  donorId     String?  @map("donor_id")
+
+  recipient Recipient? @relation(fields: [recipientId], references: [id])
+  donor     Donor?     @relation(fields: [donorId],     references: [id])
+
+  @@index([isRead],     name: "idx_alert_read")
+  @@index([createdAt],  name: "idx_alert_created")
+  @@map("alerts")
+}
+
+// ─── EXCHANGE CYCLES (Paired Kidney Exchange) ─────────────────────────────────
+// WHY: Enables matching incompatible pairs through multi-way swaps where
+// each donor gives to a compatible recipient in the cycle.
+model ExchangeCycle {
+  id                String   @id @default(uuid())
+  cycleType         String   @map("cycle_type") // 2Way | 3Way | Chain
+  status            String   @default("Proposed")  // Proposed | Active | Completed | Broken
+  altruisticDonorId String?  @map("altruistic_donor_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  legs ExchangeLeg[]
+
+  @@index([status], name: "idx_exchange_status")
+  @@map("exchange_cycles")
+}
+
+model ExchangeLeg {
+  id          String @id @default(uuid())
+  cycleId     String @map("cycle_id")
+  donorId     String @map("donor_id")
+  recipientId String @map("recipient_id")
+  legOrder    Int    @map("leg_order")
+  status      String @default("Pending") // Pending | Completed | Failed
+
+  cycle     ExchangeCycle @relation(fields: [cycleId],     references: [id])
+  donor     Donor         @relation(fields: [donorId],     references: [id])
+  recipient Recipient     @relation(fields: [recipientId], references: [id])
+
+  @@index([cycleId], name: "idx_leg_cycle")
+  @@map("exchange_legs")
+}
+
+// ─── USERS (RBAC) ─────────────────────────────────────────────────────────────
+// WHY: Role-based access ensures Auditors cannot finalize, Coordinators cannot
+// view raw SQL, and Surgeons can only act on clinical workflows.
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("Coordinator") // Coordinator | Surgeon | Auditor | Admin
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}

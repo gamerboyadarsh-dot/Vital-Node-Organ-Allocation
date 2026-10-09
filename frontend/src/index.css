@@ -1,0 +1,1223 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+:root,
+html[data-theme="blueprint"] {
+  /* Augen Pro — Apple keynote on surgical white & electric blue in monochrome void */
+  --color-off-black: #0f1012;
+  --color-pure-black: #020201;
+  --color-off-white: #f2f2f4;
+  --color-pure-white: #fdfdfd;
+  --color-steel-gray: #5e5e5e;
+  --color-ash-gray: #8f8f8f;
+  --color-signal-blue: #0071e3;
+
+  --color-canvas: #f2f2f4;
+  --color-paper: #fdfdfd;
+  --color-surface-alt: #f8f8fa;
+  --color-ink: #0f1012;
+  --color-ink-soft: #1a1c20;
+  --color-mid-gray: #5e5e5e;
+  --color-hairline: rgba(0, 0, 0, 0.06);
+  --color-ember: #e7000b;
+
+  --surface-0: #f2f2f4;
+  --surface-1: #fdfdfd;
+  --surface-2: #f8f8fa;
+  --surface-3: #eeeeF2;
+  --line: rgba(0, 0, 0, 0.07);
+  --line-bright: rgba(0, 0, 0, 0.12);
+  --line-glow: rgba(0, 113, 227, 0.08);
+
+  --ink-primary: #0f1012;
+  --ink-secondary: #5e5e5e;
+  --ink-muted: #8f8f8f;
+
+  --signal-critical: #e7000b;
+  --signal-caution: #d97706;
+  --signal-stable: #059669;
+  --signal-info: #0071e3; /* Augen Pro Signal Electric Blue */
+
+  --radius-cards: 32px;
+  --radius-large-cards: 54px;
+  --radius-buttons: 26px;
+  --radius-inputs: 26px;
+  --radius-badges: 9999px;
+  --radius-nav-pills: 10px;
+  --radius-small: 6px;
+  --radius-nested: 14px;
+
+  /* Weightless zero-shadow elevation */
+  --shadow-subtle: 0 0 0 0.5px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-subtle-2: 0 0 0 1px rgba(0, 113, 227, 0.18), 0 4px 16px -4px rgba(0, 0, 0, 0.05);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  /* Command Terminal Dark */
+  --color-canvas: #0B0F19;
+  --color-paper: #111827;
+  --color-surface-alt: #1F2937;
+  --color-ink: #F8FAFC;
+  --color-ink-soft: #E2E8F0;
+  --color-mid-gray: #94A0B0;
+  --color-hairline: #1E293B;
+  --color-ember: #F43F5E;
+
+  --surface-0: #0B0F19;
+  --surface-1: #111827;
+  --surface-2: #1F2937;
+  --surface-3: #162032;
+  --line: #1E293B;
+  --line-bright: #334155;
+  --line-glow: rgba(56, 189, 248, 0.15);
+
+  --ink-primary: #F8FAFC;
+  --ink-secondary: #94A0B0;
+  --ink-muted: #64748B;
+
+  --signal-critical: #F43F5E;
+  --signal-caution: #F59E0B;
+  --signal-stable: #10B981;
+  --signal-info: #38BDF8;
+
+  --radius-cards: 14px;
+  --radius-buttons: 8px;
+  --radius-inputs: 8px;
+  --radius-badges: 6px;
+  --radius-small: 4px;
+  --radius-nested: 8px;
+
+  --shadow-subtle: 0 4px 16px -2px rgba(0, 0, 0, 0.3);
+  --shadow-subtle-2: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: var(--surface-0);
+    color: var(--ink-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Clinical Blueprint Hairline Grid */
+    background-image: 
+      linear-gradient(to right, rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+    background-size: 34px 34px;
+    background-attachment: fixed;
+  }
+
+  html[data-theme="dark"] body {
+    /* Rich Modern Aurora Mesh Background */
+    background-image: 
+      radial-gradient(at 15% 15%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+      radial-gradient(at 85% 20%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+      radial-gradient(at 50% 85%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+      linear-gradient(to right, rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 450;
+    line-height: 1.2;
+    color: var(--ink-primary);
+    letter-spacing: -0.025em;
+  }
+  h2 {
+    font-size: 16px;
+    font-weight: 450;
+    line-height: 1.2;
+    color: var(--ink-primary);
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 450;
+    line-height: 1.2;
+    color: var(--ink-primary);
+    letter-spacing: -0.015em;
+  }
+
+  code, kbd, samp, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: 'tnum' on, 'zero' on;
+  }
+}
+
+/* ============================================================
+   Augen Pro — Soft Enclosure Cards & Floating Surfaces
+   ============================================================ */
+.panel {
+  background-color: var(--surface-1);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius-cards, 32px);
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-subtle);
+}
+
+.panel-interactive {
+  cursor: pointer;
+}
+
+.panel-interactive:hover {
+  border-color: var(--signal-info, #0071e3);
+  transform: translateY(-1.5px);
+  box-shadow: var(--shadow-subtle-2);
+}
+
+html[data-theme="dark"] .panel-interactive:hover {
+  border-color: #38BDF8;
+  transform: translateY(-3px) scale(1.005);
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(56, 189, 248, 0.18);
+}
+
+.panel-interactive:active {
+  transform: translateY(-0.5px) scale(0.998);
+}
+
+.panel-inset {
+  background-color: var(--surface-2);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius-nested, 14px);
+}
+
+/* Dynamic Cursor Spotlight Effect */
+.spotlight-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    500px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 113, 227, 0.08),
+    transparent 65%
+  );
+}
+
+.panel-interactive:hover .spotlight-glow {
+  opacity: 1;
+}
+
+/* ============================================================
+   Augen Pro — Pill Buttons, Tag Chips & Action Controls
+   ============================================================ */
+.btn-primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background-color: #0f1012;
+  border: 0.5px solid rgba(0, 0, 0, 0.12);
+  color: #FFFFFF;
+  padding: 7px 20px;
+  font-size: 12px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  border-radius: var(--radius-buttons, 26px);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+html[data-theme="dark"] .btn-primary-action {
+  background: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px -2px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btn-primary-action:hover {
+  background-color: #020201;
+  border-color: #0071e3;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="dark"] .btn-primary-action:hover {
+  box-shadow: 0 6px 20px -2px rgba(37, 99, 235, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  filter: brightness(1.08);
+}
+
+.btn-primary-action:hover::after {
+  transform: translateX(100%);
+}
+
+.btn-primary-action:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background-color: var(--surface-1);
+  border: 0.5px solid var(--line);
+  color: var(--ink-primary);
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  border-radius: var(--radius-buttons, 26px);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.btn-action:hover {
+  background-color: var(--surface-2);
+  border-color: var(--signal-info, #0071e3);
+  color: var(--signal-info, #0071e3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-subtle);
+}
+
+.btn-action:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* Form Inputs with Whisper Hairline Focus */
+.input-control {
+  background-color: var(--surface-1);
+  border: 0.5px solid var(--line);
+  color: var(--ink-primary);
+  border-radius: var(--radius-inputs, 26px);
+  padding: 7px 16px;
+  font-size: 12px;
+  letter-spacing: -0.02em;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-control:hover {
+  border-color: var(--line-bright);
+}
+
+.input-control:focus {
+  border-color: var(--signal-info, #0071e3);
+  box-shadow: 0 0 0 2px rgba(0, 113, 227, 0.15);
+}
+
+html[data-theme="dark"] .input-control {
+  background-color: #0F172A;
+  border-color: #334155;
+  color: #F8FAFC;
+}
+
+html[data-theme="dark"] .input-control:focus {
+  border-color: #38BDF8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+  background-color: #111C33;
+}
+
+/* ============================================================
+   Augen Pro — Signature Components & Utilities
+   ============================================================ */
+/* Pill Tag Chip (Category/Product/Status Chip) */
+.augen-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  border: 0.5px solid var(--signal-info, #0071e3);
+  color: var(--signal-info, #0071e3);
+  background: transparent;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+}
+
+.augen-tag:hover {
+  background: rgba(0, 113, 227, 0.06);
+}
+
+/* Floating CTA Pill */
+.augen-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 26px;
+  background-color: rgba(15, 16, 18, 0.05);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  color: var(--ink-primary, #0f1012);
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.augen-pill-btn:hover {
+  background-color: rgba(15, 16, 18, 0.09);
+  border-color: var(--signal-info, #0071e3);
+  color: var(--signal-info, #0071e3);
+  transform: translateY(-1px);
+}
+
+/* Signal Blue Text Link with hairline hover underline */
+.augen-link {
+  color: var(--signal-info, #0071e3);
+  font-size: 13px;
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  border-bottom: 0.5px solid transparent;
+  transition: border-bottom-color 0.15s ease;
+  cursor: pointer;
+}
+
+.augen-link:hover {
+  border-bottom-color: var(--signal-info, #0071e3);
+}
+
+/* Section Label Pair (quiet preamble above heading) */
+.augen-label-preamble {
+  font-size: 11px;
+  color: var(--ink-muted, #8f8f8f);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+
+.augen-label-title {
+  font-size: 20px;
+  color: var(--ink-primary, #0f1012);
+  letter-spacing: -0.025em;
+  font-weight: 450;
+  line-height: 1.2;
+}
+
+/* Rounded Card Soft Enclosure */
+.augen-card {
+  background-color: var(--surface-1);
+  border-radius: var(--radius-cards, 32px);
+  border: 0.5px solid var(--line);
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.augen-card-large {
+  border-radius: var(--radius-large-cards, 54px);
+  padding: 28px;
+}
+
+/* ============================================================
+   Shimmer Skeletons & Animated Loaders
+   ============================================================ */
+@keyframes shimmerWave {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer-box {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #1E293B 0%, #334155 50%, #1E293B 100%);
+  background-size: 200% 100%;
+  animation: shimmerMove 1.8s infinite linear;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ecgStroke {
+  0% { stroke-dashoffset: 120; }
+  50% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -120; }
+}
+
+.animate-ecg {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: ecgStroke 2.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page Entry */
+@keyframes pageSlideFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageSlideFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glowing Pulse Dots */
+.live-pulse-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10B981;
+}
+
+.live-pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background-color: inherit;
+  opacity: 0.5;
+  animation: pulseDot 2s infinite ease-out;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Table Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-bright);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-secondary);
+}
+
+/* ============================================================
+   Animated Ambient Floating Aurora Lighting Orbs
+   ============================================================ */
+@keyframes floatOrb1 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.15); }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(-45px, 35px) scale(1.12); }
+}
+
+@keyframes floatOrb3 {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(30px, 40px) scale(1.18); }
+}
+
+.aurora-orb-cyan {
+  position: fixed;
+  top: -10%;
+  left: -5%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatOrb1 18s ease-in-out infinite alternate;
+}
+
+.aurora-orb-violet {
+  position: fixed;
+  top: 15%;
+  right: -8%;
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.11) 0%, transparent 70%);
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatOrb2 22s ease-in-out infinite alternate;
+}
+
+.aurora-orb-emerald {
+  position: fixed;
+  bottom: -10%;
+  left: 35%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatOrb3 20s ease-in-out infinite alternate;
+}
+
+/* Glass Card */
+.glass-panel {
+  background: rgba(17, 24, 39, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-panel-interactive {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-interactive:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.6), 0 0 24px -4px rgba(56, 189, 248, 0.2);
+}
+
+/* Neon Text Glow */
+.text-glow-cyan {
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+}
+
+.text-glow-emerald {
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+.text-glow-amber {
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+}
+
+.text-glow-rose {
+  text-shadow: 0 0 12px rgba(244, 63, 94, 0.6);
+}
+
+@keyframes shiny-text {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-shiny-text {
+  animation: shiny-text 6s linear infinite;
+}
+
+/* ==========================================================================
+   From Uiverse.io by Nawsome — Wheel and Hamster Loader
+   ========================================================================== */
+.wheel-and-hamster {
+  --dur: 1s;
+  position: relative;
+  width: 12em;
+  height: 12em;
+  font-size: 14px;
+  display: inline-block;
+  user-select: none;
+}
+
+.wheel,
+.hamster,
+.hamster div,
+.spoke {
+  position: absolute;
+}
+
+.wheel,
+.spoke {
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.wheel {
+  background: radial-gradient(100% 100% at center, hsla(0, 0%, 60%, 0) 47.8%, hsl(0, 0%, 60%) 48%);
+  z-index: 2;
+}
+
+.hamster {
+  animation: hamster var(--dur) ease-in-out infinite;
+  top: 50%;
+  left: calc(50% - 3.5em);
+  width: 7em;
+  height: 3.75em;
+  transform: rotate(4deg) translate(-0.8em, 1.85em);
+  transform-origin: 50% 0;
+  z-index: 1;
+}
+
+.hamster__head {
+  animation: hamsterHead var(--dur) ease-in-out infinite;
+  background: hsl(30, 90%, 55%);
+  border-radius: 70% 30% 0 100% / 40% 25% 25% 60%;
+  box-shadow: 0 -0.25em 0 hsl(30, 90%, 80%) inset,
+    0.75em -1.55em 0 hsl(30, 90%, 90%) inset;
+  top: 0;
+  left: -2em;
+  width: 2.75em;
+  height: 2.5em;
+  transform-origin: 100% 50%;
+}
+
+.hamster__ear {
+  animation: hamsterEar var(--dur) ease-in-out infinite;
+  background: hsl(0, 90%, 85%);
+  border-radius: 50%;
+  box-shadow: -0.25em 0 hsl(30, 90%, 55%) inset;
+  top: -0.25em;
+  right: -0.25em;
+  width: 0.75em;
+  height: 0.75em;
+  transform-origin: 50% 75%;
+}
+
+.hamster__eye {
+  animation: hamsterEye var(--dur) linear infinite;
+  background-color: hsl(0, 0%, 0%);
+  border-radius: 50%;
+  top: 0.375em;
+  left: 1.25em;
+  width: 0.5em;
+  height: 0.5em;
+}
+
+.hamster__nose {
+  background: hsl(0, 90%, 75%);
+  border-radius: 35% 65% 85% 15% / 70% 50% 50% 30%;
+  top: 0.75em;
+  left: 0;
+  width: 0.2em;
+  height: 0.25em;
+}
+
+.hamster__body {
+  animation: hamsterBody var(--dur) ease-in-out infinite;
+  background: hsl(30, 90%, 90%);
+  border-radius: 50% 30% 50% 30% / 15% 60% 40% 40%;
+  box-shadow: 0.1em 0.75em 0 hsl(30, 90%, 55%) inset,
+    0.15em -0.5em 0 hsl(30, 90%, 80%) inset;
+  top: 0.25em;
+  left: 2em;
+  width: 4.5em;
+  height: 3em;
+  transform-origin: 17% 50%;
+  transform-style: preserve-3d;
+}
+
+.hamster__limb--fr,
+.hamster__limb--fl {
+  clip-path: polygon(0 0, 100% 0, 70% 80%, 60% 100%, 0% 100%, 40% 80%);
+  top: 2em;
+  left: 0.5em;
+  width: 1em;
+  height: 1.5em;
+  transform-origin: 50% 0;
+}
+
+.hamster__limb--fr {
+  animation: hamsterFRLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30, 90%, 80%) 80%, hsl(0, 90%, 75%) 80%);
+  transform: rotate(15deg) translateZ(-1px);
+}
+
+.hamster__limb--fl {
+  animation: hamsterFLLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30, 90%, 90%) 80%, hsl(0, 90%, 85%) 80%);
+  transform: rotate(15deg);
+}
+
+.hamster__limb--br,
+.hamster__limb--bl {
+  border-radius: 0.75em 0.75em 0 0;
+  clip-path: polygon(0 0, 100% 0, 100% 30%, 70% 90%, 70% 100%, 30% 100%, 40% 90%, 0% 30%);
+  top: 1em;
+  left: 2.8em;
+  width: 1.5em;
+  height: 2.5em;
+  transform-origin: 50% 30%;
+}
+
+.hamster__limb--br {
+  animation: hamsterBRLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30, 90%, 80%) 90%, hsl(0, 90%, 75%) 90%);
+  transform: rotate(-60deg) translateZ(-1px);
+}
+
+.hamster__limb--bl {
+  animation: hamsterBLLimb var(--dur) linear infinite;
+  background: linear-gradient(hsl(30, 90%, 90%) 90%, hsl(0, 90%, 85%) 90%);
+  transform: rotate(-25deg);
+}
+
+.hamster__tail {
+  animation: hamsterTail var(--dur) linear infinite;
+  background: hsl(0, 90%, 85%);
+  border-radius: 0.25em 50% 50% 0.25em;
+  box-shadow: 0 -0.2em 0 hsl(0, 90%, 75%) inset;
+  top: 1.5em;
+  right: -0.5em;
+  width: 1em;
+  height: 0.5em;
+  transform: rotate(30deg) translateZ(-1px);
+  transform-origin: 0.25em 0.25em;
+}
+
+.spoke {
+  animation: spoke var(--dur) linear infinite;
+  background: radial-gradient(100% 100% at center, hsl(0, 0%, 60%) 4.8%, hsla(0, 0%, 60%, 0) 5%),
+    linear-gradient(hsla(0, 0%, 55%, 0) 46.9%, hsl(0, 0%, 65%) 47% 52.9%, hsla(0, 0%, 65%, 0) 53%) 50% 50% / 99% 99% no-repeat;
+}
+
+/* Animations */
+@keyframes hamster {
+  from, to {
+    transform: rotate(4deg) translate(-0.8em, 1.85em);
+  }
+
+  50% {
+    transform: rotate(0) translate(-0.8em, 1.85em);
+  }
+}
+
+@keyframes hamsterHead {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes hamsterEye {
+  from, 90%, to {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes hamsterEar {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes hamsterBody {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(0);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes hamsterFRLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(50deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-30deg) translateZ(-1px);
+  }
+}
+
+@keyframes hamsterFLLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(-30deg);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(50deg);
+  }
+}
+
+@keyframes hamsterBRLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(-60deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(20deg) translateZ(-1px);
+  }
+}
+
+@keyframes hamsterBLLimb {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(20deg);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes hamsterTail {
+  from, 25%, 50%, 75%, to {
+    transform: rotate(30deg) translateZ(-1px);
+  }
+
+  12.5%, 37.5%, 62.5%, 87.5% {
+    transform: rotate(10deg) translateZ(-1px);
+  }
+}
+
+@keyframes spoke {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(-1turn);
+  }
+}
+
+/* ==========================================================================
+   From Uiverse.io by Lakshay-art — Glow Conic Search Bar (VitalNode Medical Palette)
+   ========================================================================== */
+.glow-search-poda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+
+.glow-search-glow,
+.glow-search-dark-border-bg,
+.glow-search-white,
+.glow-search-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  z-index: 0;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.glow-search-glow {
+  filter: blur(20px);
+  opacity: 0.45;
+}
+
+.glow-search-glow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%) rotate(60deg);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(
+    #000,
+    #0284c7 6%,
+    #000 36%,
+    #000 50%,
+    #10b981 62%,
+    #000 88%
+  );
+  transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-search-dark-border-bg::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%) rotate(82deg);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0),
+    #0369a1,
+    rgba(0, 0, 0, 0) 10%,
+    rgba(0, 0, 0, 0) 50%,
+    #047857,
+    rgba(0, 0, 0, 0) 60%
+  );
+  transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-search-white {
+  filter: blur(1.5px);
+}
+
+.glow-search-white::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%) rotate(83deg);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  filter: brightness(1.4);
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0) 0%,
+    #38bdf8,
+    rgba(0, 0, 0, 0) 8%,
+    rgba(0, 0, 0, 0) 50%,
+    #34d399,
+    rgba(0, 0, 0, 0) 58%
+  );
+  transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-search-border {
+  filter: blur(0.5px);
+}
+
+.glow-search-border::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%) rotate(70deg);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  filter: brightness(1.3);
+  background-image: conic-gradient(
+    #0b0f19,
+    #0284c7 5%,
+    #0b0f19 14%,
+    #0b0f19 50%,
+    #10b981 60%,
+    #0b0f19 64%
+  );
+  transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover rotation effects */
+.glow-search-poda:hover > .glow-search-dark-border-bg::before {
+  transform: translate(-50%, -50%) rotate(-98deg);
+}
+.glow-search-poda:hover > .glow-search-glow::before {
+  transform: translate(-50%, -50%) rotate(-120deg);
+}
+.glow-search-poda:hover > .glow-search-white::before {
+  transform: translate(-50%, -50%) rotate(-97deg);
+}
+.glow-search-poda:hover > .glow-search-border::before {
+  transform: translate(-50%, -50%) rotate(-110deg);
+}
+
+/* Focus rotation effects */
+.glow-search-poda:focus-within > .glow-search-dark-border-bg::before {
+  transform: translate(-50%, -50%) rotate(442deg);
+  transition: transform 4s linear;
+}
+.glow-search-poda:focus-within > .glow-search-glow::before {
+  transform: translate(-50%, -50%) rotate(420deg);
+  transition: transform 4s linear;
+}
+.glow-search-poda:focus-within > .glow-search-white::before {
+  transform: translate(-50%, -50%) rotate(443deg);
+  transition: transform 4s linear;
+}
+.glow-search-poda:focus-within > .glow-search-border::before {
+  transform: translate(-50%, -50%) rotate(430deg);
+  transition: transform 4s linear;
+}
+
+.glow-search-main {
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+  z-index: 1;
+  background-color: #070a11;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.glow-search-input {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  color: #f8fafc;
+  padding-left: 36px;
+  padding-right: 38px;
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  position: relative;
+  z-index: 2;
+}
+
+.glow-search-input::placeholder {
+  color: #94a0b0;
+  opacity: 0.8;
+}
+
+.glow-search-flare {
+  pointer-events: none;
+  width: 24px;
+  height: 16px;
+  position: absolute;
+  background: #38bdf8;
+  top: 8px;
+  left: 6px;
+  filter: blur(14px);
+  opacity: 0.7;
+  transition: all 1.2s;
+  z-index: 1;
+}
+
+.glow-search-main:hover > .glow-search-flare {
+  opacity: 0.2;
+}
+
+.glow-search-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+  color: #38bdf8;
+}
+
+.glow-search-filter-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  height: 28px;
+  width: 28px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #111827, #070a11, #1e293b);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.glow-search-filter-icon:hover {
+  border-color: rgba(56, 189, 248, 0.6);
+  background: linear-gradient(180deg, #1e293b, #0f172a, #334155);
+}
+
+/* ============================================================
+   Clinical Blueprint Overrides & Enhancements
+   ============================================================ */
+html[data-theme="blueprint"] .glow-search-main {
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme="blueprint"] .glow-search-input {
+  color: #0a0a0a;
+}
+
+html[data-theme="blueprint"] .glow-search-input::placeholder {
+  color: #a3a3a3;
+}
+
+html[data-theme="blueprint"] .glow-search-filter-icon {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  color: #737373;
+}
+
+html[data-theme="blueprint"] .glow-search-filter-icon:hover {
+  background: #f0f0f0;
+  color: #0a0a0a;
+}
+
+html[data-theme="blueprint"] .glow-search-glow,
+html[data-theme="blueprint"] .glow-search-dark-border-bg,
+html[data-theme="blueprint"] .glow-search-white,
+html[data-theme="blueprint"] .glow-search-border {
+  opacity: 0.22;
+}
+
+html[data-theme="blueprint"] .aurora-orb-cyan,
+html[data-theme="blueprint"] .aurora-orb-violet,
+html[data-theme="blueprint"] .aurora-orb-emerald {
+  opacity: 0.2;
+}
+
+/* ============================================================
+   Crazy Entrance Reveal Keyframes
+   ============================================================ */
+@keyframes laserSweep {
+  0% {
+    top: -5%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}
+
+
+
+

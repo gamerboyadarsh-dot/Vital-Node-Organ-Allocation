@@ -1,0 +1,29 @@
+{
+  "name": "odrmn-backend",
+  "version": "1.0.0",
+  "description": "ODRMN Backend API",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node prisma/seed.js",
+    "migrate": "npx prisma migrate dev --name init",
+    "db:push": "npx prisma db push",
+    "generate": "npx prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-validator": "^7.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "socket.io": "^4.8.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prisma": "^5.14.0"
+  }
+}
