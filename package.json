@@ -7,6 +7,7 @@
     "build:all": "npm --prefix frontend run build && npm --prefix backend run generate",
     "start": "node backend/server.js",
     "seed": "node backend/prisma/seed.js",
+    "test": "npm --prefix backend test",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""

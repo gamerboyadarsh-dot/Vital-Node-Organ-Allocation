@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getRecipients } from '../api/client';
+import { getRecipients, updateRecipient, deleteRecipient } from '../api/client';
 import UrgencyBadge from '../components/UrgencyBadge';
 import LoadingState from '../components/LoadingState';
 import GlowSearchBar from '../components/GlowSearchBar';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, Edit3, Trash2, X, AlertCircle } from 'lucide-react';
 
 const BLOOD_GROUPS = ['', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const ORGAN_TYPES = ['', 'Kidney', 'Liver', 'Heart', 'Lung', 'Pancreas', 'Cornea'];
@@ -13,16 +13,59 @@ export default function RecipientList() {
   const [recipients, setRecipients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ bloodGroup: '', organTypeNeeded: '', status: 'Waiting', search: '' });
+  const [toast, setToast] = useState(null);
+  const [editingRecipient, setEditingRecipient] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', age: '', severityScore: 5, waitTimeDays: 0, status: 'Waiting' });
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const loadRecipients = () => {
     setLoading(true);
     getRecipients(filters)
       .then(setRecipients)
-      .catch(console.error)
+      .catch((err) => showToast(err.message, 'error'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { loadRecipients(); }, [filters]);
+
+  const handleEditOpen = (recipient) => {
+    setEditingRecipient(recipient);
+    setEditForm({
+      name: recipient.name,
+      age: recipient.age,
+      severityScore: recipient.severityScore,
+      waitTimeDays: recipient.waitTimeDays,
+      status: recipient.status,
+    });
+  };
+
+  const handleEditSave = async (e) => {
+    e.preventDefault();
+    if (!editingRecipient) return;
+    try {
+      await updateRecipient(editingRecipient.id, editForm);
+      showToast(`Recipient ${editForm.name} updated successfully!`);
+      setEditingRecipient(null);
+      loadRecipients();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleDeleteRecipient = async (recipient) => {
+    if (!window.confirm(`Are you sure you want to remove recipient ${recipient.name} (${recipient.organTypeNeeded})?`)) return;
+    try {
+      await deleteRecipient(recipient.id);
+      showToast(`Recipient ${recipient.name} removed successfully!`);
+      loadRecipients();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
 
   const getStatusBadge = (status) => {
     if (status === 'Waiting') return 'bg-amber-950/60 text-amber-300 border-amber-500/40 shadow-glow-amber';
@@ -40,6 +83,14 @@ export default function RecipientList() {
 
   return (
     <div className="p-5 space-y-5 max-w-7xl mx-auto page-enter">
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 panel p-3 text-xs font-mono border shadow-lg ${
+          toast.type === 'error' ? 'bg-rose-950/80 border-rose-500 text-rose-200' : 'bg-surface-1 border-cyan-500/50 text-cyan-300'
+        }`}>
+          {toast.msg}
+        </div>
+      )}
+
       {/* Header */}
       <div className="panel p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-1">
         <div>
@@ -120,7 +171,8 @@ export default function RecipientList() {
                   <th className="p-2.5 px-3">PRIOR FAILS</th>
                   <th className="p-2.5 px-3">URGENCY TIER</th>
                   <th className="p-2.5 px-3">HOSPITAL HUB</th>
-                  <th className="p-2.5 px-3 text-right">STATUS</th>
+                  <th className="p-2.5 px-3">STATUS</th>
+                  <th className="p-2.5 px-3 text-right">ACTIONS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line/60">
@@ -141,10 +193,29 @@ export default function RecipientList() {
                       <UrgencyBadge score={r.urgencyScore} escalated={r.priorFailedMatches > 0} />
                     </td>
                     <td className="p-2.5 px-3 text-ink-secondary">{r.hospital?.city}</td>
-                    <td className="p-2.5 px-3 text-right">
+                    <td className="p-2.5 px-3">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(r.status)}`}>
                         {r.status}
                       </span>
+                    </td>
+                    <td className="p-2.5 px-3 text-right">
+                      <div className="flex justify-end gap-1.5">
+                        <button
+                          onClick={() => handleEditOpen(r)}
+                          className="p-1 px-1.5 rounded hover:bg-surface-3 text-ink-secondary hover:text-cyan-400 border border-line text-[11px] flex items-center gap-1 transition-colors"
+                          title="Edit Recipient (UPDATE operation)"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRecipient(r)}
+                          className="p-1 px-1.5 rounded hover:bg-rose-950/40 text-ink-secondary hover:text-rose-400 border border-line hover:border-rose-500/40 text-[11px] flex items-center gap-1 transition-colors"
+                          title="Delete Recipient (DELETE operation)"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -153,6 +224,105 @@ export default function RecipientList() {
           </div>
         )}
       </div>
+
+      {/* Live UPDATE Modal for Recipient */}
+      {editingRecipient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+          <div className="bg-surface-1 border border-line rounded-2xl w-full max-w-md p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-line">
+              <div>
+                <h3 className="font-semibold text-sm text-ink-primary">Live Database UPDATE: Recipient</h3>
+                <p className="text-[11px] font-mono text-ink-secondary">ID: {editingRecipient.id.slice(0, 12)}...</p>
+              </div>
+              <button onClick={() => setEditingRecipient(null)} className="p-1.5 rounded-full hover:bg-surface-2 text-ink-secondary hover:text-ink-primary">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSave} className="space-y-3 text-xs font-mono">
+              <div>
+                <label className="text-ink-secondary block mb-1">Patient Name</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="input-control w-full text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-ink-secondary block mb-1">Age</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    required
+                    value={editForm.age}
+                    onChange={(e) => setEditForm({ ...editForm, age: e.target.value })}
+                    className="input-control w-full text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="text-ink-secondary block mb-1">Severity Score (1-10)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    required
+                    value={editForm.severityScore}
+                    onChange={(e) => setEditForm({ ...editForm, severityScore: e.target.value })}
+                    className="input-control w-full text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-ink-secondary block mb-1">Wait Time (Days)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editForm.waitTimeDays}
+                    onChange={(e) => setEditForm({ ...editForm, waitTimeDays: e.target.value })}
+                    className="input-control w-full text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="text-ink-secondary block mb-1">Status</label>
+                  <select
+                    value={editForm.status}
+                    onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                    className="input-control w-full text-xs bg-surface-1"
+                  >
+                    <option value="Waiting">Waiting</option>
+                    <option value="Matched">Matched</option>
+                    <option value="Transplanted">Transplanted</option>
+                    <option value="Removed">Removed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-line">
+                <button
+                  type="button"
+                  onClick={() => setEditingRecipient(null)}
+                  className="btn-action text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary-action text-xs font-mono"
+                >
+                  Save Changes (UPDATE)
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -27,6 +27,8 @@ export const getDonors = (params = {}) => {
 };
 export const getDonor = (id) => request(`/donors/${id}`);
 export const createDonor = (data) => request('/donors', { method: 'POST', body: JSON.stringify(data) });
+export const updateDonor = (id, data) => request(`/donors/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteDonor = (id) => request(`/donors/${id}`, { method: 'DELETE' });
 export const updateDonorConsent = (id, consentStatus, actor) =>
   request(`/donors/${id}/consent`, { method: 'PATCH', body: JSON.stringify({ consentStatus, actor }) });
 export const getDonorMatches = (id) => request(`/donors/${id}/matches`);
@@ -38,6 +40,8 @@ export const getRecipients = (params = {}) => {
 };
 export const getRecipient = (id) => request(`/recipients/${id}`);
 export const createRecipient = (data) => request('/recipients', { method: 'POST', body: JSON.stringify(data) });
+export const updateRecipient = (id, data) => request(`/recipients/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+export const deleteRecipient = (id) => request(`/recipients/${id}`, { method: 'DELETE' });
 export const getPriorityList = () => request('/recipients/priority-list');
 
 // ── Matches ───────────────────────────────────────────────────
@@ -94,5 +98,9 @@ export const getSimulationStatus = () => request('/simulation/status');
 export const toggleSimulation = (data) => request('/simulation/toggle', { method: 'POST', body: JSON.stringify(data) });
 export const triggerSimulationEvent = (type) => request('/simulation/trigger', { method: 'POST', body: JSON.stringify({ type }) });
 export const getHubWeather = () => request('/simulation/weather');
+
+// ── SQL & Relational Database Evaluation Inspector ────────────
+export const getSqlPresets = () => request('/sql/presets');
+export const executeSql = (query) => request('/sql/execute', { method: 'POST', body: JSON.stringify({ query }) });
 
 

@@ -19,7 +19,8 @@ import {
   Sparkles,
   Navigation,
   Bot,
-  Cpu
+  Cpu,
+  Database
 } from 'lucide-react';
 import VitalNodeLogo from './VitalNodeLogo';
 import { useSocket } from '../hooks/useSocket';
@@ -69,6 +70,7 @@ export default function Sidebar({
     { to: '/hospitals', label: 'Hospital Command', icon: Building2 },
     { to: '/audit', label: 'Audit Ledger', icon: FileSpreadsheet },
     { to: '/analytics', label: 'System Analytics', icon: BarChart3 },
+    { to: '/sql', label: 'SQL Inspector', icon: Database },
   ];
 
   const handleLogout = () => {

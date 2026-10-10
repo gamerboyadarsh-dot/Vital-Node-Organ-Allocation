@@ -15,13 +15,15 @@ import {
   Command,
   Navigation,
   Bot,
-  FileText
+  FileText,
+  Database
 } from 'lucide-react';
 import { getDonors, getRecipients } from '../api/client';
 
 const STATIC_ACTIONS = [
   { id: 'dash', title: 'Allocation Command Overview', category: 'Pages', to: '/', icon: LayoutDashboard, tag: 'Dashboard' },
   { id: 'match', title: 'Launch Match Engine & Transit Solver', category: 'Pages', to: '/match', icon: Dna, tag: 'Cross-Match' },
+  { id: 'sql', title: '🗄️ Open Live SQL & Relational Query Inspector (Joins, Aggregates, Views)', category: 'Pages', to: '/sql', icon: Database, tag: 'SQL Console' },
   { id: 'radar', title: '🛸 Open Real-Time Organ Flight Radar & Medevac Tracker', category: 'Diagnostics', isRadar: true, icon: Navigation, tag: 'Radar' },
   { id: 'copilot', title: '🤖 Open VitalAI Clinical Allocation Copilot', category: 'Diagnostics', isCopilot: true, icon: Bot, tag: 'VitalAI' },
   { id: 'manifest', title: '📄 View Cryptographic Surgical Allocation Dossier', category: 'Diagnostics', isManifest: true, icon: FileText, tag: 'Dossier' },

@@ -135,6 +135,92 @@ router.get('/:id/matches', async (req, res) => {
     if (err.message.includes('not available')) return res.status(400).json({ error: err.message });
     res.status(500).json({ error: err.message });
   }
+// PUT /api/donors/:id — update donor record
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, age, bloodGroup, organType, hospitalId, isAvailable, consentStatus } = req.body;
+
+    const data = {};
+    if (name) data.name = name;
+    if (age !== undefined) data.age = parseInt(age);
+    if (bloodGroup) {
+      if (!VALID_BLOOD_GROUPS.includes(bloodGroup)) {
+        return res.status(400).json({ error: `Invalid bloodGroup` });
+      }
+      data.bloodGroup = bloodGroup;
+    }
+    if (organType) {
+      if (!VALID_ORGAN_TYPES.includes(organType)) {
+        return res.status(400).json({ error: `Invalid organType` });
+      }
+      data.organType = organType;
+    }
+    if (hospitalId) data.hospitalId = hospitalId;
+    if (isAvailable !== undefined) data.isAvailable = Boolean(isAvailable);
+    if (consentStatus) {
+      if (!VALID_CONSENT.includes(consentStatus)) {
+        return res.status(400).json({ error: `Invalid consentStatus` });
+      }
+      data.consentStatus = consentStatus;
+    }
+
+    const donor = await prisma.donor.update({
+      where: { id: req.params.id },
+      data,
+      include: { hospital: true },
+    });
+
+    const { writeAuditLog } = require('../services/auditLogger');
+    await writeAuditLog({
+      entityType: 'Donor',
+      entityId: donor.id,
+      action: 'UPDATED',
+      actor: req.body.actor || 'ClinicalCoordinator',
+      details: `Donor ${donor.name} record updated: ${JSON.stringify(data)}`,
+    });
+
+    res.json(donor);
+  } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ error: 'Donor not found' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/donors/:id — delete donor record (if not finalized/transplanted)
+router.delete('/:id', async (req, res) => {
+  try {
+    const donor = await prisma.donor.findUnique({
+      where: { id: req.params.id },
+      include: { transplants: true, compatibilityMatches: { where: { matchStatus: 'Finalized' } } },
+    });
+
+    if (!donor) return res.status(404).json({ error: 'Donor not found' });
+    if (donor.transplants.length > 0 || donor.compatibilityMatches.length > 0) {
+      return res.status(400).json({ error: 'Cannot delete donor with finalized allocation or completed transplant.' });
+    }
+
+    // Clean up candidate matches first
+    await prisma.compatibilityMatch.deleteMany({
+      where: { donorId: req.params.id },
+    });
+
+    await prisma.donor.delete({
+      where: { id: req.params.id },
+    });
+
+    const { writeAuditLog } = require('../services/auditLogger');
+    await writeAuditLog({
+      entityType: 'Donor',
+      entityId: req.params.id,
+      action: 'DELETED',
+      actor: req.body?.actor || 'ClinicalCoordinator',
+      details: `Donor ${donor.name} [${donor.organType}] record deleted from system.`,
+    });
+
+    res.json({ success: true, message: `Donor ${donor.name} deleted successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

@@ -124,6 +124,90 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+// PUT /api/recipients/:id — update recipient record (severity, wait time, details)
+router.put('/:id', async (req, res) => {
+  try {
+    const { name, age, bloodGroup, organTypeNeeded, severityScore, waitTimeDays, priorFailedMatches, hospitalId, status } = req.body;
+
+    const data = {};
+    if (name) data.name = name;
+    if (age !== undefined) data.age = parseInt(age);
+    if (bloodGroup) {
+      if (!VALID_BLOOD_GROUPS.includes(bloodGroup)) return res.status(400).json({ error: 'Invalid bloodGroup' });
+      data.bloodGroup = bloodGroup;
+    }
+    if (organTypeNeeded) {
+      if (!VALID_ORGAN_TYPES.includes(organTypeNeeded)) return res.status(400).json({ error: 'Invalid organTypeNeeded' });
+      data.organTypeNeeded = organTypeNeeded;
+    }
+    if (severityScore !== undefined) {
+      const sv = parseInt(severityScore);
+      if (isNaN(sv) || sv < 1 || sv > 10) return res.status(400).json({ error: 'severityScore must be 1-10' });
+      data.severityScore = sv;
+    }
+    if (waitTimeDays !== undefined) data.waitTimeDays = parseInt(waitTimeDays);
+    if (priorFailedMatches !== undefined) data.priorFailedMatches = parseInt(priorFailedMatches);
+    if (hospitalId) data.hospitalId = hospitalId;
+    if (status) data.status = status;
+
+    const recipient = await prisma.recipient.update({
+      where: { id: req.params.id },
+      data,
+      include: { hospital: true },
+    });
+
+    const { writeAuditLog } = require('../services/auditLogger');
+    await writeAuditLog({
+      entityType: 'Recipient',
+      entityId: recipient.id,
+      action: 'UPDATED',
+      actor: req.body.actor || 'ClinicalCoordinator',
+      details: `Recipient ${recipient.name} updated: ${JSON.stringify(data)}`,
+    });
+
+    const enriched = { ...recipient, ...computeUrgencyScore(recipient) };
+    res.json(enriched);
+  } catch (err) {
+    if (err.code === 'P2025') return res.status(404).json({ error: 'Recipient not found' });
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/recipients/:id — delete recipient record
+router.delete('/:id', async (req, res) => {
+  try {
+    const recipient = await prisma.recipient.findUnique({
+      where: { id: req.params.id },
+      include: { transplants: true, compatibilityMatches: { where: { matchStatus: 'Finalized' } } },
+    });
+
+    if (!recipient) return res.status(404).json({ error: 'Recipient not found' });
+    if (recipient.transplants.length > 0 || recipient.compatibilityMatches.length > 0) {
+      return res.status(400).json({ error: 'Cannot delete recipient with completed transplant or active allocation.' });
+    }
+
+    // Clean candidate matches first
+    await prisma.compatibilityMatch.deleteMany({
+      where: { recipientId: req.params.id },
+    });
+
+    await prisma.recipient.delete({
+      where: { id: req.params.id },
+    });
+
+    const { writeAuditLog } = require('../services/auditLogger');
+    await writeAuditLog({
+      entityType: 'Recipient',
+      entityId: req.params.id,
+      action: 'DELETED',
+      actor: req.body?.actor || 'ClinicalCoordinator',
+      details: `Recipient ${recipient.name} [${recipient.organTypeNeeded}] deleted from registry.`,
+    });
+
+    res.json({ success: true, message: `Recipient ${recipient.name} removed successfully` });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

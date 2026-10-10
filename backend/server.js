@@ -57,6 +57,7 @@ app.use('/api/alerts',      require('./src/routes/alerts'));
 app.use('/api/exchange',    require('./src/routes/exchange'));
 app.use('/api/auth',        require('./src/routes/auth'));
 app.use('/api/simulation',  require('./src/routes/simulation'));
+app.use('/api/sql',         require('./src/routes/sqlInspector'));
 
 // ── Initialize Autonomous Real-Time Hospital Daemon ─────────────
 const liveSimulationService = require('./src/services/liveSimulationService');

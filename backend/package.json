@@ -9,7 +9,8 @@
     "seed": "node prisma/seed.js",
     "migrate": "npx prisma migrate dev --name init",
     "db:push": "npx prisma db push",
-    "generate": "npx prisma generate"
+    "generate": "npx prisma generate",
+    "test": "node src/test/evaluationSuite.js"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
