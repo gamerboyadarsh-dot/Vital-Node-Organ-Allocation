@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Organ Donation & Recipient Matching Network",
   "scripts": {
-    "build": "npm --prefix frontend run build",
-    "build:all": "npm --prefix frontend run build && npm --prefix backend run generate",
+    "build": "npm --prefix backend install && npm --prefix backend run generate && npm --prefix frontend install && npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend install && npm --prefix backend run generate",
+    "build:frontend": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build:all": "npm run build",
     "start": "node backend/server.js",
     "seed": "node backend/prisma/seed.js",
     "test": "npm --prefix backend test",
