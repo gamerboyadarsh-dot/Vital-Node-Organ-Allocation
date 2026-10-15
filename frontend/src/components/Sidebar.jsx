@@ -20,7 +20,8 @@ import {
   Navigation,
   Bot,
   Cpu,
-  Database
+  Database,
+  Globe
 } from 'lucide-react';
 import VitalNodeLogo from './VitalNodeLogo';
 import { useSocket } from '../hooks/useSocket';
@@ -68,6 +69,7 @@ export default function Sidebar({
     { to: '/donors', label: 'Donor Registry', icon: HeartPulse },
     { to: '/recipients', label: 'Waitlist Registry', icon: Users },
     { to: '/hospitals', label: 'Hospital Command', icon: Building2 },
+    { to: '/map', label: 'Geographic Map', icon: Globe },
     { to: '/audit', label: 'Audit Ledger', icon: FileSpreadsheet },
     { to: '/analytics', label: 'System Analytics', icon: BarChart3 },
     { to: '/sql', label: 'SQL Inspector', icon: Database },

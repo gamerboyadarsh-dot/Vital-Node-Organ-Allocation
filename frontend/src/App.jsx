@@ -14,6 +14,7 @@ import HospitalView from './pages/HospitalView';
 import AuditLog from './pages/AuditLog';
 import Analytics from './pages/Analytics';
 import SqlInspector from './pages/SqlInspector';
+import NetworkMap from './pages/NetworkMap';
 import LoginPage from './pages/LoginPage';
 import { SocketProvider, useSocket } from './hooks/useSocket';
 import { getUnreadAlertCount } from './api/client';
@@ -205,6 +206,7 @@ function AppContent() {
           <Route path="/audit" element={<AuditLog />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/sql" element={<SqlInspector />} />
+          <Route path="/map" element={<NetworkMap />} />
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </main>

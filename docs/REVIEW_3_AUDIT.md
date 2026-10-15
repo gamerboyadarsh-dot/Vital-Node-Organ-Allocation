@@ -57,6 +57,7 @@
 | 14 | **Semi-Structured / NoSQL** | `backend/src/routes/sqlInspector.js` | **COMPLIANT** | JSON arrays for `hlaType` validated and queried using `json_valid()` and array indices. | Preserved JSON array typing for multi-locus tissue markers. |
 | 15 | **Security & Access Control (RBAC)**| `backend/src/routes/auth.js`, `backend/src/routes/sqlInspector.js` | **COMPLIANT** | JWT auth with bcrypt hashing; SQL Inspector requires `Admin` or `Auditor` privileges. | Injected bearer tokens into frontend `client.js` and added RBAC check to `/api/sql/execute`. |
 | 16 | **Database Backup and Recovery** | `backend/src/scripts/backupRestore.js` | **COMPLIANT** | Full database snapshot taken and verified against disposable restore database with zero loss. | Added `npm run test:backup` script. |
+| 17 | **Geographic World & Regional Map** | `frontend/src/components/NetworkWorldMap.jsx`, `frontend/src/pages/NetworkMap.jsx` | **COMPLIANT** | Interactive Leaflet GIS map with 15 real DB hospitals (`latitude`, `longitude`) & Haversine transit arcs. | Built dedicated `/map` page and modal toggle. |
 
 ---
 

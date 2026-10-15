@@ -16,20 +16,22 @@ import {
   RotateCw,
   ExternalLink,
   MapPin,
-  Sparkles
+  Sparkles,
+  Globe
 } from 'lucide-react';
 import { playUiSound } from '../utils/audioFeedback';
+import NetworkWorldMap from './NetworkWorldMap';
 
-// Simulated active transplant transit corridors across the regional network
+// Active transplant transit corridors mapped to real database hospital nodes
 const INITIAL_FLIGHTS = [
   {
     id: 'VEC-704',
     callsign: 'MEDEVAC-704',
     type: 'Air Medevac (Sikorsky S-76C)',
     organ: 'Heart',
-    donorHospital: 'Mount Sinai Hospital',
-    recipientHospital: 'Bellevue Medical Center',
-    route: 'JFK Corridor -> Manhattan Heliport',
+    donorHospital: 'AIIMS (New Delhi)',
+    recipientHospital: 'Apollo Hospitals (Chennai)',
+    route: 'DEL Airspace -> MAA Approach Corridor',
     originCoords: { x: 75, y: 35 },
     destCoords: { x: 38, y: 62 },
     progress: 58, // 0 to 100%
@@ -52,9 +54,9 @@ const INITIAL_FLIGHTS = [
     callsign: 'AERO-DRONE-9',
     type: 'Autonomous EVTOL Cargo Drone',
     organ: 'Kidney (Left)',
-    donorHospital: 'Stanford Health Care',
-    recipientHospital: 'UCSF Medical Center',
-    route: 'Palo Alto Air Corridor -> Parnassus Pod',
+    donorHospital: 'Fortis Hospital (Mumbai)',
+    recipientHospital: 'Manipal Hospital (Bengaluru)',
+    route: 'BOM Air Corridor -> BLR Heliport Pod',
     originCoords: { x: 82, y: 78 },
     destCoords: { x: 28, y: 28 },
     progress: 32,
@@ -77,9 +79,9 @@ const INITIAL_FLIGHTS = [
     callsign: 'RAPID-GROUND-14',
     type: 'Priority Paramedic Courier',
     organ: 'Liver (Right Lobe)',
-    donorHospital: 'Massachusetts General',
-    recipientHospital: 'Brigham and Women’s Hospital',
-    route: 'Express Emergency Highway Grid',
+    donorHospital: 'PGI Chandigarh',
+    recipientHospital: 'CMC Vellore',
+    route: 'Express Emergency Transport Grid',
     originCoords: { x: 30, y: 40 },
     destCoords: { x: 68, y: 80 },
     progress: 84,
@@ -100,6 +102,7 @@ const INITIAL_FLIGHTS = [
 ];
 
 export default function OrganTransitRadarModal({ isOpen, onClose, selectedCorridorId = null }) {
+  const [activeView, setActiveView] = useState('map'); // 'map' (GIS World Map) or 'radar' (Tactical)
   const [flights, setFlights] = useState(INITIAL_FLIGHTS);
   const [selectedFlightId, setSelectedFlightId] = useState(selectedCorridorId || INITIAL_FLIGHTS[0].id);
   const [radarSweepAngle, setRadarSweepAngle] = useState(0);
@@ -226,31 +229,61 @@ export default function OrganTransitRadarModal({ isOpen, onClose, selectedCorrid
           </div>
 
           <div className="flex items-center gap-2.5">
-            <button
-              onClick={toggleAdverseWeather}
-              className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 ${
-                adverseWeather
-                  ? 'bg-signal-critical/20 text-signal-critical border-signal-critical/40'
-                  : 'bg-surface-2 text-ink-secondary hover:text-ink-primary border-line'
-              }`}
-              title="Simulate headwind meteorological delays on Cold Ischemia Time"
-            >
-              <Wind className="w-3.5 h-3.5" />
-              <span>{adverseWeather ? 'Clear Storm' : 'Simulate Squall'}</span>
-            </button>
+            {/* View Mode Toggle: World Map vs Tactical Radar */}
+            <div className="flex items-center bg-surface-2 p-0.5 rounded-lg border border-line text-xs font-mono">
+              <button
+                onClick={() => setActiveView('map')}
+                className={`px-3 py-1 rounded-md transition-all flex items-center gap-1.5 ${
+                  activeView === 'map'
+                    ? 'bg-surface-0 text-signal-info border border-signal-info/30 font-semibold shadow'
+                    : 'text-ink-secondary hover:text-ink-primary'
+                }`}
+              >
+                <Globe className="w-3.5 h-3.5" />
+                <span>GIS World Map</span>
+              </button>
+              <button
+                onClick={() => setActiveView('radar')}
+                className={`px-3 py-1 rounded-md transition-all flex items-center gap-1.5 ${
+                  activeView === 'radar'
+                    ? 'bg-surface-0 text-signal-info border border-signal-info/30 font-semibold shadow'
+                    : 'text-ink-secondary hover:text-ink-primary'
+                }`}
+              >
+                <Navigation className="w-3.5 h-3.5" />
+                <span>Tactical Sweep</span>
+              </button>
+            </div>
 
-            <button
-              onClick={handleSimulateNewLaunch}
-              disabled={isSimulatingLaunch}
-              className="btn-primary-action text-xs font-mono"
-            >
-              {isSimulatingLaunch ? (
-                <RotateCw className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Plane className="w-3.5 h-3.5" />
-              )}
-              <span>Dispatch Medevac</span>
-            </button>
+            {activeView === 'radar' && (
+              <>
+                <button
+                  onClick={toggleAdverseWeather}
+                  className={`px-3 py-1.5 rounded-full border text-xs font-mono transition-all flex items-center gap-1.5 ${
+                    adverseWeather
+                      ? 'bg-signal-critical/20 text-signal-critical border-signal-critical/40'
+                      : 'bg-surface-2 text-ink-secondary hover:text-ink-primary border-line'
+                  }`}
+                  title="Simulate headwind meteorological delays on Cold Ischemia Time"
+                >
+                  <Wind className="w-3.5 h-3.5" />
+                  <span>{adverseWeather ? 'Clear Storm' : 'Simulate Squall'}</span>
+                </button>
+
+                <button
+                  onClick={handleSimulateNewLaunch}
+                  disabled={isSimulatingLaunch}
+                  className="btn-primary-action text-xs font-mono"
+                >
+                  {isSimulatingLaunch ? (
+                    <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Plane className="w-3.5 h-3.5" />
+                  )}
+                  <span>Dispatch Medevac</span>
+                </button>
+              </>
+            )}
 
             <button
               onClick={onClose}
@@ -261,8 +294,14 @@ export default function OrganTransitRadarModal({ isOpen, onClose, selectedCorrid
           </div>
         </div>
 
-        {/* Radar Main Display Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
+        {/* Modal Body: Active Tab View */}
+        {activeView === 'map' ? (
+          <div className="p-3 flex-1 overflow-auto bg-surface-0/60">
+            <NetworkWorldMap height="72vh" />
+          </div>
+        ) : (
+          /* Radar Main Display Grid */
+          <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
           {/* Tactical GIS Radar Map Canvas (7 cols) */}
           <div className="lg:col-span-7 bg-[#050811] relative p-4 flex flex-col justify-between overflow-hidden min-h-[420px] border-b lg:border-b-0 lg:border-r border-line">
             {/* Holographic Radar Concentric Circles */}
@@ -561,6 +600,7 @@ export default function OrganTransitRadarModal({ isOpen, onClose, selectedCorrid
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

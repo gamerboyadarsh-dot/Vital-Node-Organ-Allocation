@@ -22,6 +22,7 @@
 | **Frontend Command Terminal** | **Vercel** | **[https://vital-node-organ-allocation.vercel.app](https://vital-node-organ-allocation.vercel.app)** |
 | **Backend REST & WebSockets** | **Render** | **[https://vital-node-organ-allocation.onrender.com](https://vital-node-organ-allocation.onrender.com)** |
 | **Interactive Live SQL Console** | **Vercel** | **[https://vital-node-organ-allocation.vercel.app/sql](https://vital-node-organ-allocation.vercel.app/sql)** |
+| **Geographic GIS Network Map** | **Vercel** | **[https://vital-node-organ-allocation.vercel.app/map](https://vital-node-organ-allocation.vercel.app/map)** |
 | **Live Health Check Probe** | **Render** | **[https://vital-node-organ-allocation.onrender.com/api/health](https://vital-node-organ-allocation.onrender.com/api/health)** |
 | **Comprehensive Review 3 Audit Manual** | **Docs** | **[docs/REVIEW_3_AUDIT.md](docs/REVIEW_3_AUDIT.md)** |
 
