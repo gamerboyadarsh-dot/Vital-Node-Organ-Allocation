@@ -120,7 +120,7 @@ ORDER BY total_donors DESC;`
     sql: `SELECT d.name, d.organ_type, d.blood_group, d.hla_type
 FROM donors d
 WHERE json_valid(d.hla_type) = 1
-ORDER BY d.created_at DESC
+ORDER BY d.registered_at DESC
 LIMIT 10;`
   },
   {
@@ -139,7 +139,10 @@ router.get('/presets', (req, res) => {
   res.json(PRESET_QUERIES);
 });
 
-// POST /api/sql/execute — execute safe SQL query
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'vitalnode-dev-secret-change-in-prod';
+
+// POST /api/sql/execute — execute safe SQL query with RBAC & Audit Trail
 router.post('/execute', async (req, res) => {
   try {
     const { query } = req.body;
@@ -147,16 +150,67 @@ router.post('/execute', async (req, res) => {
       return res.status(400).json({ error: 'SQL query string required' });
     }
 
+    // RBAC verification: check token if provided
+    let actor = 'EvaluationOperator (Demo)';
+    let userRole = 'Auditor';
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        actor = decoded.username || actor;
+        userRole = decoded.role || userRole;
+        // Role check: Only Admin and Auditor roles can run arbitrary raw SQL
+        if (userRole !== 'Admin' && userRole !== 'Auditor') {
+          return res.status(403).json({
+            error: `RBAC Access Denied: SQL Inspector requires 'Admin' or 'Auditor' privileges. Current role: '${userRole}'.`
+          });
+        }
+      } catch (tokenErr) {
+        // Invalid token provided
+        return res.status(401).json({ error: 'Invalid or expired authentication token.' });
+      }
+    }
+
     const trimmed = query.trim();
-    // Safety check: block destructive schema drop commands during evaluation
     const normalized = trimmed.toUpperCase();
-    if (normalized.includes('DROP DATABASE') || normalized.includes('DROP TABLE')) {
-      return res.status(403).json({ error: 'DROP TABLE/DATABASE is restricted for safety during live demonstration.' });
+
+    // Safety checks: block destructive DDL and credential tampering
+    if (
+      normalized.includes('DROP DATABASE') ||
+      normalized.includes('DROP TABLE') ||
+      normalized.includes('ALTER TABLE') ||
+      normalized.includes('ATTACH') ||
+      normalized.includes('DETACH')
+    ) {
+      return res.status(403).json({
+        error: 'DDL commands (DROP, ALTER, ATTACH) are restricted for security during live evaluation.'
+      });
+    }
+
+    if (
+      normalized.includes('USERS') &&
+      (normalized.includes('DELETE') || normalized.includes('UPDATE') || normalized.includes('INSERT'))
+    ) {
+      return res.status(403).json({
+        error: 'Modifications to the security/users credentials table are prohibited.'
+      });
     }
 
     const startTime = Date.now();
     const rows = await prisma.$queryRawUnsafe(trimmed);
     const executionTimeMs = Date.now() - startTime;
+
+    // Log the execution in append-only audit trail
+    await prisma.auditLog.create({
+      data: {
+        entityType: 'SqlInspector',
+        entityId: 'RAW_QUERY',
+        action: 'SQL_EXECUTION',
+        actor: `${actor} [${userRole}]`,
+        details: trimmed.length > 250 ? trimmed.substring(0, 247) + '...' : trimmed,
+      },
+    }).catch(err => console.warn('Audit log write warning:', err.message));
 
     res.json({
       success: true,
@@ -164,7 +218,8 @@ router.post('/execute', async (req, res) => {
       rowCount: Array.isArray(rows) ? rows.length : (rows?.length || 0),
       executionTimeMs,
       columns: Array.isArray(rows) && rows.length > 0 ? Object.keys(rows[0]) : [],
-      data: rows
+      data: rows,
+      actor: `${actor} (${userRole})`
     });
   } catch (err) {
     res.status(400).json({ error: err.message });

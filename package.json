@@ -8,6 +8,7 @@
     "start": "node backend/server.js",
     "seed": "node backend/prisma/seed.js",
     "test": "npm --prefix backend test",
+    "test:backup": "npm --prefix backend run test:backup",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""

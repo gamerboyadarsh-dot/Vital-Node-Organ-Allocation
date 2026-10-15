@@ -16,6 +16,8 @@ backend/.env
 
 # SQLite Database (optional: keep if you want seeded demo or ignore for production volumes)
 backend/prisma/*.db-journal
+backend/prisma/*.backup.db
+backend/prisma/*.restore_test.db
 
 # Logs
 npm-debug.log*

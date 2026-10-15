@@ -7,8 +7,10 @@
 const BASE = (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api` : '/api');
 
 async function request(path, options = {}) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('vn_token') : null;
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    headers: { 'Content-Type': 'application/json', ...authHeaders, ...options.headers },
     ...options,
   });
   const data = await res.json();

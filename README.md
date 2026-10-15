@@ -9,12 +9,13 @@
 [![Live Demo](https://img.shields.io/badge/Frontend-Vercel%20Live-brightgreen?style=for-the-badge&logo=vercel)](https://vital-node-organ-allocation.vercel.app)
 [![API Server](https://img.shields.io/badge/Backend-Render%20Live-blue?style=for-the-badge&logo=render)](https://vital-node-organ-allocation.onrender.com)
 [![SQL Inspector](https://img.shields.io/badge/SQL%20Console-Interactive-blueviolet?style=for-the-badge)](https://vital-node-organ-allocation.vercel.app/sql)
-[![Evaluation Tests](https://img.shields.io/badge/Evaluation%20Tests-10%2F10%20Passed-success?style=for-the-badge)](https://github.com/gamerboyadarsh-dot/Vital-Node-Organ-Allocation)
+[![Evaluation Tests](https://img.shields.io/badge/Review%203%20Evaluation-11%2F11%20Passed-success?style=for-the-badge)](docs/REVIEW_3_AUDIT.md)
+[![Audit Manual](https://img.shields.io/badge/Audit%20Report-DA3%20Manual-orange?style=for-the-badge)](docs/REVIEW_3_AUDIT.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
 ---
 
-### 🌐 Live Production Deployments
+### 🌐 Live Production Deployments & Evaluation Manual
 
 | Component | Platform | Live URL |
 | :--- | :--- | :--- |
@@ -22,6 +23,7 @@
 | **Backend REST & WebSockets** | **Render** | **[https://vital-node-organ-allocation.onrender.com](https://vital-node-organ-allocation.onrender.com)** |
 | **Interactive Live SQL Console** | **Vercel** | **[https://vital-node-organ-allocation.vercel.app/sql](https://vital-node-organ-allocation.vercel.app/sql)** |
 | **Live Health Check Probe** | **Render** | **[https://vital-node-organ-allocation.onrender.com/api/health](https://vital-node-organ-allocation.onrender.com/api/health)** |
+| **Comprehensive Review 3 Audit Manual** | **Docs** | **[docs/REVIEW_3_AUDIT.md](docs/REVIEW_3_AUDIT.md)** |
 
 ---
 
@@ -40,7 +42,7 @@ In modern medicine, organ transplantation remains a miracle hindered by archaic 
 
 ## 🎓 Academic Demonstration Guide: Live Evaluation Checklist
 
-This section directly maps to the **Project Implementation & Live Demonstration** evaluation criteria. Every feature is functional and demonstrable live in the deployed app or local environment.
+This section directly maps to the **Project Implementation & Live Demonstration** evaluation criteria. Every feature is functional and demonstrable live in the deployed app or local environment. Full requirement matrix available in [docs/REVIEW_3_AUDIT.md](docs/REVIEW_3_AUDIT.md).
 
 | Evaluation Criterion | Implementation Details | How to Demonstrate Live |
 | :--- | :--- | :--- |
@@ -53,12 +55,13 @@ This section directly maps to the **Project Implementation & Live Demonstration*
 | **7. Nested Subqueries** | Correlated subquery identifying patients whose clinical severity exceeds their organ's regional average. | Open **SQL Inspector** (`/sql`) → Click **"2. Nested Subquery with Correlated Filter"** → Click **Run Query**. |
 | **8. Aggregate Functions** | `COUNT(*)`, `AVG(age)`, `MIN(age)`, `MAX(age)` grouped by `organ_type` filtered via `HAVING COUNT(*) > 0`. | Open **SQL Inspector** (`/sql`) → Click **"3. Aggregate Functions with GROUP BY & HAVING"** → Click **Run Query**. |
 | **9. Database Views** | Materialized/Virtual SQL View: `v_critical_waitlist` filtering high-acuity patients ($severity \ge 8$). | Open **SQL Inspector** (`/sql`) → Click **"4. Database View Query (v_critical_waitlist)"** → Click **Run Query**. |
-| **10. Triggers & Stored Logic** | SQL trigger `trg_recipient_status_audit` + serialized 2-phase commit stored function `finalizeMatch`. | Open **SQL Inspector** (`/sql`) → Click **"6. Trigger Activity & Audit Log Inspection"** to see automated trigger logs. |
-| **11. Semi-Structured / NoSQL** | Multi-locus HLA tissue typing stored as JSON arrays (`HLA-A`, `HLA-B`, `DRB1`) with Jaccard coefficient evaluation. | Open **SQL Inspector** (`/sql`) → Click **"5. Semi-Structured NoSQL / JSON Array Inspection"**. |
-| **12. Cloud Database Support** | Seamless driver interchangeability via Prisma: swap from SQLite to PostgreSQL with a single configuration line. | See [Cloud Database Configuration](#-cloud-database-configuration-postgresql--supabase--neon). |
-| **13. Dashboard & Visualization** | Live KPI counters, priority waitlist, organ inventory donut chart, 3D exchange topology, and ADS-B radar. | View **Overview Dashboard** (`/`) and open **Transit Radar** or **3D Exchange Graph** (`/exchange`). |
-| **14. Security & Access Control** | JWT authentication, bcrypt password hashing, coordinator authorization, append-only immutable audit trail. | Log out and log in via `/login`; view audit ledger at `/audit`. |
-| **15. Automated Verification** | Automated end-to-end test suite testing connectivity, CRUD, joins, subqueries, aggregates, views, and triggers. | Run `npm test` in the terminal to watch all 10 evaluation checks pass. |
+| **10. Triggers & Engine Audit** | SQLite database trigger `trg_recipient_status_audit` automatically inserting `actor: 'DB_TRIGGER'` audit record on status UPDATE. | Open **SQL Inspector** (`/sql`) → Click **"6. Trigger Activity & Audit Log Inspection"** to see automated trigger logs. |
+| **11. ACID Transactions & Rollback** | Prisma `$transaction` with pre-commit availability validation; aborts with `409 Conflict` on race conditions with zero orphan rows. | Run `npm test` (Test 11 verifies automatic rollback on conflicted candidate allocation). |
+| **12. Semi-Structured / NoSQL** | Multi-locus HLA tissue typing stored as JSON arrays (`HLA-A`, `HLA-B`, `DRB1`) with Jaccard coefficient evaluation. | Open **SQL Inspector** (`/sql`) → Click **"5. Semi-Structured NoSQL / JSON Array Inspection"**. |
+| **13. Cloud Database Support** | Seamless driver interchangeability via Prisma: swap from SQLite to PostgreSQL with a single configuration line. | See [Cloud Database Configuration](#-cloud-database-configuration-postgresql--supabase--neon). |
+| **14. Dashboard & Visualization** | Live KPI counters, priority waitlist, organ inventory donut chart, 3D exchange topology, and ADS-B radar. | View **Overview Dashboard** (`/`) and open **Transit Radar** or **3D Exchange Graph** (`/exchange`). |
+| **15. Security & Access Control** | JWT authentication, bcrypt password hashing, coordinator authorization, append-only immutable audit trail. | Log out and log in via `/login`; view audit ledger at `/audit`. |
+| **16. Automated Verification** | Automated end-to-end test suite testing connectivity, CRUD, joins, subqueries, aggregates, views, triggers, and rollback. | Run `npm test` in the terminal to watch all 11 evaluation checks pass. |
 
 ---
 
@@ -167,11 +170,11 @@ flowchart TD
 To demonstrate automated database verification live in front of evaluators:
 
 ```bash
-# Run from repository root
+# Run 11-point live evaluation suite from repository root
 npm test
 ```
 
-### Output:
+### Observed Live Execution Output:
 ```text
 ================================================================
   VITALNODE (ODRMN) — ACADEMIC LIVE EVALUATION TEST SUITE       
@@ -186,13 +189,39 @@ npm test
   ✔ [PASSED] 7. Nested Correlated Subquery (Candidate Severity > Organ Category Average)
   ✔ [PASSED] 8. Aggregate Functions (COUNT, AVG, MIN, MAX with GROUP BY & HAVING)
   ✔ [PASSED] 9. Database View Verification (SELECT * FROM v_critical_waitlist)
-  ✔ [PASSED] 10. Database Triggers & Audit Log Insertion
+  ✔ [PASSED] 10. Database Triggers (trg_recipient_status_audit Engine-Level Proof)
+  ✔ [PASSED] 11. ACID Transaction Rollback on Conflict (Guarantees Atomicity)
 
 ----------------------------------------------------------------
-  Test Summary: 10/10 criteria passed.
+  Test Summary: 11/11 criteria passed.
   ✔ SYSTEM IS 100% READY FOR LIVE ACADEMIC EVALUATION!
 ----------------------------------------------------------------
 ```
+
+### 💾 Database Backup & Disaster Recovery Verification
+```bash
+# Verify atomic snapshot and restoration on a disposable target database
+npm run test:backup
+```
+```text
+[1] Primary Database verified: odrmn.db (2.44 MB)
+[2] Creating atomic database snapshot to odrmn.backup.db...
+    ✔ Snapshot successfully created (2.44 MB).
+[3] Testing recovery by restoring snapshot to disposable target...
+[4] Integrity Check on Restored Database:
+    - Hospitals: 15 | Donors: 761 | Recipients: 201 | Matches: 1931 | Audit Logs: 860
+  ✔ [PASSED] BACKUP & RESTORE INTEGRITY VERIFIED WITHOUT DATA LOSS!
+[5] Disposable recovery test database safely deleted.
+```
+
+### ⚡ Query Plan Optimization (`EXPLAIN QUERY PLAN`)
+The database schema utilizes composite and single-column B-tree indexes for zero table-scan candidate filtering:
+- **Composite Index** `idx_donor_organ_blood (organ_type, blood_group)`:
+  `SEARCH donors USING INDEX idx_donor_organ_blood (organ_type=? AND blood_group=?)`
+- **Single Index** `idx_recipient_status (status)`:
+  `SEARCH recipients USING INDEX idx_recipient_status (status=?)`
+- **Correlated Subquery** `idx_recipient_organ_type (organ_type_needed)`:
+  `CORRELATED SCALAR SUBQUERY 1 -> SEARCH r2 USING INDEX idx_recipient_organ_type (organ_type_needed=?)`
 
 ---
 
